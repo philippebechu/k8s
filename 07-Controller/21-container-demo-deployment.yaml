@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-demo
+  labels:
+    app: container-demo
+spec:
+  selector:
+    matchLabels:
+      app: container-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: container-demo
+    spec:
+      containers:
+      - name: container-demo
+        image: dmaumenee/container-demo:1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TITLE
+          value: "Formation Kubernetes"
+        - name: SHOW_VERSION
+          value: "true"
+        - name: METADATA
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace          
+        livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 2
+        readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 2
+            successThreshold: 2
+            timeoutSeconds: 2

@@ -1,0 +1,144 @@
+# Les Pods
+## bonus
+
+1/ Création d’un fichier manifest (YAML) pour un Pod à un container :
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simplepod1
+spec:
+  containers:
+  - name: container1
+    image: centos
+    env:
+    - name: MESSAGE
+      value: "Hello Word"
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo '$(MESSAGE)'; sleep 10;done"]
+    resources:  #Si absent: error from server (Forbidden) car ResourceQuota present
+     limits:
+      memory: "200Mi"
+      cpu: "1"
+     requests: 
+      memory: "100Mi"
+      cpu: "0.5"
+```
+
+
+2/ Création du Pod à partir du manifest:
+```bash
+$ kubectl create -f simplepod1.yaml --record
+(--record enregistre la commande en cours dans les annotations)
+```
+
+
+3/ Afficher les informations sur les Pods en cours d’execution:
+
+```sh
+# permet d'afficher le Node auquel le pod a été assigné
+$ kubectl get pod simplepod1 -o wide
+
+# spécifie l’afficher la configuration complete de l'objet
+$ kubectl get pod simplepod1 -o yaml
+
+# description de l'objet
+$ kubectl describe pod simplepod1
+```
+
+
+4/ Voir le résultat de la commande exécuté dans le conteneur, affichez les journaux du pod:`
+```bash
+$ kubectl logs simplepod1
+```
+
+
+5/ S'attacher à un conteneur en cours d'exécution dans un Pod.
+```bash
+$ kubectl attach simplepod1
+$ kubectl attach simplepod1 -c container1
+```
+
+
+6/ Exécuter une commande dans un conteneur:
+ - Récupère le résultat de l'exécution de 'date' à partir du pod "simplepod1"
+```bash
+$ kubectl exec simplepod1 date
+```
+ - Récupère le résultat de l'exécution de 'date' dans le conteneur "container1" du pod "simplepod1"
+```bash
+$ kubectl exec simplepod1 -c container1 date
+```
+ - Récupérer la stdin de "container1" à partir du simplepod1 :
+ ```bash
+ $ kubectl exec -it simplepod1 -- /bin/bash
+printenv
+ls -al
+exit
+
+ $ kubectl exec simplepod1 -c container1 -it -- bash
+```
+
+Dans le shell, exécutez la commande "printenv" pour répertorier les variables d’environnement.
+
+
+7/ Supprimez un Pod:
+
+```bash
+$ kubectl delete pod simplepod1
+$ kubectl delete --grace-period=0 --force pod simplepod1
+ *(Remplacer la valeur de grace par défaut "La valeur 0 force la suppression du Pod")
+```
+
+
+
+---------------------------------------------------------------------------------------------------------------
+## Manifeste Template:
+---------------------------------------------------------------------------------------------------------------
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monpod
+  namespace: namespace1
+  annotations:
+    description: my frontend
+  labels:
+    environment: "production"
+    tier: "frontend"
+spec:
+  restartPolicy: Always
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 2000
+  containers:
+  - name: container1
+    image: ubuntu
+    imagePullPolicy: Always
+    env:
+    -name: envname
+     value: "valenv"
+    ressources:
+     limits:
+      memory: "200Mi"
+      cpu: "1"
+      ephemeral-storage: "4Gi"
+     requests: 
+      memory: "100Mi"
+      cpu: "0.5"
+      ephemeral-storage: "2Gi"
+    securityContext:
+     allowPrivilegeEscalation: false
+    livenessProbe:
+     initialDelaySeconds: 15
+     timeoutSeconds: 1
+     httpGet:
+      path: /site
+      port: 8080
+      httpHeaders:
+      - name: X-Custom-Header
+        value: Awesome
+    command: ['sh','-c','echo Hello onepoint! && sleep ]
+    #args: -cpus "2"
+   
+```

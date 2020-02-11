@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: container-demo-pod
+spec:
+  containers:
+  - name: container-demo-container
+    image: dmaumenee/container-demo:1.0
+    env:
+      - name: TITLE
+        value: "Formation Kubernetes"
+      - name: SHOW_VERSION
+        value: "true"
+      - name: METADATA
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace    
+    ports:
+      - containerPort: 8080
+        hostPort: 30080

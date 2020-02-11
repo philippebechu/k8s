@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: container-demo-ingress
+spec:
+  rules:
+  # utilisation de xip.io pour simuler un wildcard DNS (see http://xip.io)
+  # remplacer XX.XX.XX.XX par une ip public
+  - host: container-demo-ingress.XX.XX.XX.XX.xip.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName:  container-demo-svc
+          servicePort: 80

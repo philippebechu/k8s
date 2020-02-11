@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-demo
+spec:
+  selector:
+    matchLabels:
+      app: container-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: container-demo
+    spec:
+      containers:
+      - name: container-demo
+        image: dmaumenee/container-demo:1.0

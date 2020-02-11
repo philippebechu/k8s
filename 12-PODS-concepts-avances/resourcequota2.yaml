@@ -1,0 +1,9 @@
+apiVersion:   v1 
+kind:   ResourceQuota 
+metadata: 
+  name:   quota
+  namespace: my-namespace-rq
+spec: 
+  hard: 
+    limits.cpu:   "5" 
+    limits.memory:   10Gi 
