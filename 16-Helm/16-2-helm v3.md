@@ -12,18 +12,18 @@ There are a few ways to install Helm. The newest version may require building fr
 
 ## Install Helm
 
-1. On the master node use wget to download the compressed tar file.  https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-linux-amd64.tar.gz
+1. On the master node use wget to download the compressed tar file.  https://get.helm.sh/helm-v3.0.3-linux-amd64.tar.gz
 
 ```sh
-$ wget https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-linux-amd64.tar.gz
+$ wget https://get.helm.sh/helm-v3.0.3-linux-amd64.tar.gz
 <output_omitted>
-2019-05-13 08:17:46 (26.0 MB/s) - ‘helm-v2.13.1-linux-amd64.tar.gz’ saved [22949819/22949819]
+2019-05-13 08:17:46 (26.0 MB/s) - ‘helm-v3.0.3-linux-amd64.tar.gz’ saved [22949819/22949819]
 ```
 
 2. Uncompress and expand the file.
 
 ```sh
-$ tar -xvf helm-v2.13.1-linux-amd64.tar.gz
+$ tar -xvf helm-v3.0.3-linux-amd64.tar.gz
 linux-amd64/
 linux-amd64/README.md
 linux-amd64/helm
@@ -34,58 +34,18 @@ linux-amd64/LICENSE
 
 ```sh
 $ sudo cp linux-amd64/helm /usr/local/bin/
+sudo mv linux-amd64/helm /usr/local/bin/helm
 ```
 
-4. Due to new RBAC configuration helm is unable to run in the default namespace, in this version of Kubernetes. During initialization you could choose to create and declare a new namespace. Other RBAC issues may be encountered even then. In this lab we will create a service account for tiller, and give it admin abilities on the cluster. More on RBAC in
-another chapter.
-Begin by creating the serviceaccount object.
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
-```sh
-$ kubectl create serviceaccount \
---namespace kube-system tiller
-serviceaccount "tiller" created
-```
+helm search repo stable
 
-5. Bind the serviceaccount to the admin role called cluster-admin inside the kube-system namespace.
+helm repo update
 
-```
-$ kubectl create clusterrolebinding \
-tiller-cluster-rule \
---clusterrole=cluster-admin \
---serviceaccount=kube-system:tiller
-clusterrolebinding.rbac.authorization.k8s.io/tiller-cluster-rule created
-```
+helm ls
 
-6. We can now initialize helm. This process will also configure tiller the client process. There are several possible options to pass such as nodeAffinity, a particular version of software, alternate storage backend, and even a dry-run option to generate JSON or YAML output. The output could be edited and ingested into kubectl. We will use default values in this case.
 
-```
-$ helm init
-<output_omitted>
-```
-
-7. Update the tiller-deploy deployment to have the service account.
- ```Error: release my-wordpress failed: namespaces "default" is forbidden: User "system:serviceaccount:kube-system:default" cannot get resource "namespaces" in API group "" in the namespace "default"```
-
-```sh
-$ kubectl -n kube-system patch deployment \
-tiller-deploy -p \
-'{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-```
-
-8. Verify the tiller pod is running. Examine the logs of the pod. Note that each line of log begins with an tag of the component generating the messages, such as [main], [storage], and [storage].
-
-```
-$ kubectl get pods --all-namespaces
-<output_omitted>
-kube-system tiller-deploy-664d6bdc7b-s6bdw 1/1 Running 0 30m
-$ kubectl -n kube-system logs tiller-deploy-<TAB>
-[main] 2019/05/13 08:26:37 Starting Tiller v2.13.1 (tls=false)
-[main] 2019/05/13 08:26:37 GRPC listening on :44134
-[main] 2019/05/13 08:26:37 Probes listening on :44135
-[main] 2019/05/13 08:26:37 Storage driver is ConfigMap
-[main] 2019/05/13 08:26:37 Max history per release is 0
-<output_omitted>
-```
 
 9. View the available sub-commands for helm. As with other Kubernetes tools, expect ongoing change.
 
@@ -127,8 +87,8 @@ index.yaml
 
 ```
 helm version
-Client: &version.Version{SemVer:"v2.13.1", GitCommit:"618447cbf...", GitTreeState:"clean"}
-Server: &version.Version{SemVer:"v2.13.1", GitCommit:"618447cbf...", GitTreeState:"clean"}
+Client: &version.Version{SemVer:"v3.0.3", GitCommit:"618447cbf...", GitTreeState:"clean"}
+Server: &version.Version{SemVer:"v3.0.3", GitCommit:"618447cbf...", GitTreeState:"clean"}
 ```
 
 12. Ensure both are upgraded to the most recent stable version.

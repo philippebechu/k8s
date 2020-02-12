@@ -45,9 +45,14 @@ Error from server (BadRequest): a container name must be specified for pod conta
 # affichage des logs du container wget-container qui réaliser des wget sur localhost:8080 et affiche le resultat retourné par le container container-demo-container
 kubectl logs -c wget-container container-demo-pod
 
+# delete de l'ancien pod
+kubectl delete -f 20-container-demo-pod-multi-container.yaml
 
 # création du pod à partir du fichier 05-PODS/container-demo/21-container-demo-pod-multi-container-KO.yaml
 kubectl apply -f 21-container-demo-pod-multi-container-KO.yaml
+
+# delete de l'ancien pod
+kubectl delete -f 21-container-demo-pod-multi-container-KO.yaml
 
 # création du pod à partir du fichier 05-PODS/container-demo/22-container-demo-pod-multi-container.yaml
 kubectl apply -f 22-container-demo-pod-multi-container.yaml

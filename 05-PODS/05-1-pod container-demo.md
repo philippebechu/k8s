@@ -60,7 +60,7 @@ kubectl get pod container-demo-pod -o jsonpath='{.status.podIP}'
 POD_IP=`kubectl get pod container-demo-pod -o jsonpath='{.status.podIP}'`
 
 # access the container-demo /ping API from the master or the worker
-# sous windows remplacer $POD_IP par l'IP du pod
+# Ne fonctionne que sur les VMs qui composent le cluster
 curl $POD_IP:8080/ping
 
 
